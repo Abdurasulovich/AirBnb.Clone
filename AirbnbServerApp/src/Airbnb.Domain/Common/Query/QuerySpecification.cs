@@ -1,41 +1,48 @@
-﻿using Airbnb.Domain.Common.Caching;
-using Airbnb.Domain.Common.Entities;
+﻿using System.Linq.Expressions;
+using Airbnb.Domain.Common.Caching;
 using Airbnb.Domain.Common.Entities.Interfaces;
+using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Comparers;
 using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
 
-namespace Airbnb.Domain.Common.Query;
+namespace AirBnB.Domain.Common.Query;
 
-public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, int? hashCode = default): CacheModel where TEntity: IEntity
+/// <summary>
+/// Represents a query specification for retrieving entities from a cache.
+/// </summary>
+/// <param name="pageSize"></param>
+/// <param name="pageToken"></param>
+/// <param name="asNoTracking"></param>
+/// <typeparam name="TEntity"></typeparam>
+public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asNoTracking)
+    : QuerySpecification(pageSize, pageToken, asNoTracking) where TEntity :
+    IEntity
 {
+    /// <summary>
+    /// Gets filtering options collection for query.
+    /// </summary>
     public List<Expression<Func<TEntity, bool>>> FilteringOptions { get; } = [];
 
-    public List<Expression<Func<TEntity, object>>> IncludeOptions { get; } = [];
+    /// <summary>
+    /// Gets ordering options collection for query.
+    /// </summary>
+    public List<(Expression<Func<TEntity, object>> KeySelector, bool IsAscending)> OrderingOptions { get; } = [];
 
-    public List<(Expression<Func<TEntity, object>> KeySelector, bool isAscending)> OrderingOptions { get; } = [];
-
-    public FilterPagination PaginationOptions { get; set; } = new(pageSize, pageToken);
-
-    public int? FilterHashCode { get; set; } = hashCode;
+    /// <summary>
+    /// /// Gets including options collection for query.
+    /// </summary>
+    public List<Expression<Func<TEntity, object>>> IncludingOptions { get; } = [];
 
     public override int GetHashCode()
     {
-        if(FilterHashCode.HasValue) return FilterHashCode.Value;
-
-        var expressionEqualityComperer = ExpressionEqualityComparer.Instance;
         var hashCode = new HashCode();
-
-        var test = expressionEqualityComperer.GetHashCode(FilteringOptions[0]);
+        var expressionEqualityComparer = ExpressionEqualityComparer.Instance;
 
         foreach (var filter in FilteringOptions.Order(new PredicateExpressionComparer<TEntity>()))
-            hashCode.Add(expressionEqualityComperer.GetHashCode(filter));
+            hashCode.Add(expressionEqualityComparer.GetHashCode(filter));
 
-        foreach(var filter in OrderingOptions)
-        {
-            hashCode.Add(expressionEqualityComperer.GetHashCode(filter.KeySelector));
-            hashCode.Add(filter.isAscending);
-        }
+        foreach (var filter in OrderingOptions)
+            hashCode.Add(expressionEqualityComparer.GetHashCode(filter.KeySelector));
 
         hashCode.Add(PaginationOptions);
 
@@ -44,9 +51,44 @@ public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, int? has
 
     public override bool Equals(object? obj)
     {
-        return obj is QuerySpecification<TEntity> querySpecification &&
-            querySpecification.GetHashCode() == GetHashCode();
+        return obj is QuerySpecification<TEntity> querySpecification && querySpecification.GetHashCode() == GetHashCode();
+    }
+}
+
+public class QuerySpecification : CacheModel
+{
+    /// <summary>
+    /// /// Gets pagination options for query.
+    /// </summary>
+    public FilterPagination PaginationOptions { get; set; }
+
+    public bool AsNoTracking { get; }
+
+    public QuerySpecification(uint pageSize, uint pageToken, bool asNoTracking)
+    {
+        PaginationOptions = new FilterPagination(pageSize, pageToken);
+        AsNoTracking = asNoTracking;
     }
 
-    public override string CacheKey => $"{typeof(TEntity).Name}_{GetHashCode()}";
+    public QuerySpecification(FilterPagination filterPagination, bool asNoTracking)
+    {
+        PaginationOptions = filterPagination;
+        AsNoTracking = asNoTracking;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+
+        hashCode.Add(PaginationOptions);
+
+        return hashCode.ToHashCode();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is QuerySpecification querySpecification && querySpecification.GetHashCode() == GetHashCode();
+    }
+
+    public override string CacheKey => GetHashCode().ToString();
 }

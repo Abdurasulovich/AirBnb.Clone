@@ -1,8 +1,10 @@
 export  class Location{
+    public id!: string;
     public imageUrl!: string;
     public name!: string;
-    public buildYear!: number;
-    public FreeDate!: string;
-    public pricePerNigth!: number;
-    public feedback!: number;
+    public builtYear!: number;
+    public pricePerNight!: number;
+    public feedBack!: number;
+    public categoryId!: string;
+    public freeDate!: string;
 }

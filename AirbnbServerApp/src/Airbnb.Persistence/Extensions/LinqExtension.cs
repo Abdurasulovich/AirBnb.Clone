@@ -1,94 +1,226 @@
-﻿using Airbnb.Domain.Common.Entities.Interfaces;
-using Airbnb.Domain.Common.Query;
+﻿using AirBnB.Domain.Common;
+using Airbnb.Domain.Common.Entities.Interfaces;
+using AirBnB.Domain.Common.Query;
 using Microsoft.EntityFrameworkCore;
 
-namespace Airbnb.Persistence.Extensions;
 
-public static class LinqExtension
+namespace AirBnB.Persistence.Extensions;
+
+/// <summary>
+/// Provides extension methods for applying query specifications to IQueryable and IEnumerable collections.
+/// </summary>
+public static class LinqExtensions
 {
-    public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : class, IEntity
+    /// <summary>
+    /// Applies the specified query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : class, IEntity
     {
         source = source
+            .ApplyPagination(querySpecification)
             .ApplyPredicates(querySpecification)
-            .ApplyIncludes(querySpecification)
+            .ApplyOrdering(querySpecification)
+            .ApplyIncluding(querySpecification);
+
+        return source;
+    }
+    
+    /// <summary>
+    /// Applies the specified query specification to the IEnumerable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplySpecification<TSource>(this IEnumerable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
+    {
+        source = source
+            .ApplyPagination(querySpecification)
+            .ApplyPredicates(querySpecification)
+            .ApplyOrdering(querySpecification);
+
+        return source;
+    }
+    
+    /// <summary>
+    /// Applies the specified query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplySpecification<TSource>(this IQueryable<TSource> source, QuerySpecification querySpecification)
+        where TSource : class, IEntity
+    {
+        source = source
             .ApplyPagination(querySpecification);
 
         return source;
     }
-
-    public static IEnumerable<TSource> ApplySpecification<TSource>(this IEnumerable<TSource> sources,
-        QuerySpecification<TSource> querySpecification) where TSource: class, IEntity
+    
+    /// <summary>
+    /// Applies the specified query specification to the IEnumerable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplySpecification<TSource>(this IEnumerable<TSource> source, QuerySpecification querySpecification)
+        where TSource : IEntity
     {
-        sources = sources.ApplyPredicates(querySpecification)
-            .ApplyOrdering(querySpecification)
+        source = source
             .ApplyPagination(querySpecification);
 
-        return sources;
+        return source;
     }
-
-    public static IQueryable<TSource> ApplyPredicates<TSource>(this IQueryable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : IEntity
+    
+    /// <summary>
+    /// Applies filtering predicates from the query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplyPredicates<TSource>(this IQueryable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
     {
         querySpecification.FilteringOptions.ForEach(predicate => source = source.Where(predicate));
-
         return source;
     }
 
-    public static IQueryable<TSource> ApplyIncludes<TSource>(this IQueryable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : class, IEntity
+    /// <summary>
+    ///Applies the specified query specification to the IEnumerable source. 
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplyPredicates<TSource>(this IEnumerable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
     {
-        querySpecification.IncludeOptions.ForEach(includeOption => source = source.Include(includeOption));
-
-        return source; 
+        querySpecification.FilteringOptions.ForEach(predicate => source = source.Where(predicate.Compile()));
+        return source;
     }
 
-    public static IEnumerable<TSource> ApplyPredicates<TSource>(this IEnumerable<TSource> sources,
-        QuerySpecification<TSource> querySpecification) where TSource : IEntity
-    {
-        querySpecification.FilteringOptions.ForEach(predicate => sources = sources.Where(predicate.Compile()));
-
-        return sources;
-    }
-
-    public static IQueryable<TSource> ApplyOrdering<TSource>(this IQueryable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : IEntity
+    /// <summary>
+    /// Applies filtering predicates from the query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplyOrdering<TSource>(this IQueryable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
     {
         if (!querySpecification.OrderingOptions.Any())
             source.OrderBy(entity => entity.Id);
 
-        querySpecification.OrderingOptions.ForEach(orderByExpression=> source= orderByExpression.isAscending 
-        ? source.OrderBy(orderByExpression.Item1)
-        : source.OrderByDescending(orderByExpression.Item1));
+        querySpecification.OrderingOptions.ForEach(
+            orderExpression => source = orderExpression.IsAscending
+                ? source.OrderBy(orderExpression.Item1)
+                : source.OrderByDescending(orderExpression.Item1)
+        );
 
         return source;
     }
 
-    public static IEnumerable<TSource> ApplyOrdering<TSource>(this IEnumerable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource: IEntity
+    
+    /// <summary>
+    /// Applies filtering predicates from the query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplyIncluding<TSource>(this IQueryable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : class, IEntity
     {
-        if(!querySpecification.OrderingOptions.Any())
-            source.OrderBy(entity => entity.Id);
+        querySpecification.IncludingOptions.ForEach(includeOption => source = source.Include(includeOption));
+        
+        return source;
+    }
+    
+    /// <summary>
+    /// Applies the specified query specification to the IEnumerable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplyOrdering<TSource>(this IEnumerable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
+    {
+        if (querySpecification.OrderingOptions.Count == 0)
+            return source.OrderBy(entity => entity.Id);
 
         querySpecification.OrderingOptions.ForEach(
-            orderByExpression => source = orderByExpression.isAscending
-            ? source.OrderBy(orderByExpression.Item1.Compile())
-            : source.OrderByDescending(orderByExpression.Item1.Compile()));
+            orderExpression => source = orderExpression.IsAscending
+                ? source.OrderBy(orderExpression.Item1.Compile())
+                : source.OrderByDescending(orderExpression.Item1.Compile())
+        );
 
         return source;
     }
-
-    public static IQueryable<TSource> ApplyPagination<TSource>(this IQueryable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : IEntity
+    
+    /// <summary>
+    /// Applies pagination options from the query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplyPagination<TSource>(this IQueryable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
+    {   
+        return source.Skip((int)((querySpecification.PaginationOptions.PageToken - 1) * querySpecification.PaginationOptions.PageSize))
+            .Take((int)querySpecification.PaginationOptions.PageSize);
+    }
+    
+    /// <summary>
+    /// Applies pagination options from the query specification to the IEnumerable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplyPagination<TSource>(this IEnumerable<TSource> source, QuerySpecification<TSource> querySpecification)
+        where TSource : IEntity
     {
         return source.Skip((int)((querySpecification.PaginationOptions.PageToken - 1) * querySpecification.PaginationOptions.PageSize))
             .Take((int)querySpecification.PaginationOptions.PageSize);
     }
-
-    public static IEnumerable<TSource> ApplyPagination<TSource>(this IEnumerable<TSource> source,
-        QuerySpecification<TSource> querySpecification) where TSource : IEntity
+    
+    /// <summary>
+    /// Applies pagination options from the query specification to the IQueryable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IQueryable<TSource> ApplyPagination<TSource>(this IQueryable<TSource> source, QuerySpecification querySpecification)
+        where TSource : IEntity
+    {   
+        return source.Skip((int)((querySpecification.PaginationOptions.PageToken - 1) * querySpecification.PaginationOptions.PageSize))
+            .Take((int)querySpecification.PaginationOptions.PageSize);
+    }
+    
+    /// <summary>
+    /// Applies pagination options from the query specification to the IEnumerable source.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="querySpecification"></param>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    public static IEnumerable<TSource> ApplyPagination<TSource>(this IEnumerable<TSource> source, QuerySpecification querySpecification)
+        where TSource : IEntity
     {
-        return source.Skip((int)((querySpecification.PaginationOptions.PageToken-1) * querySpecification.PaginationOptions.PageSize))
+        return source.Skip((int)((querySpecification.PaginationOptions.PageToken - 1) * querySpecification.PaginationOptions.PageSize))
             .Take((int)querySpecification.PaginationOptions.PageSize);
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Airbnb.Persistence.Migrations
 {
     [DbContext(typeof(AirbnbDbContext))]
-    [Migration("20231231141355_InitialCreated")]
-    partial class InitialCreated
+    [Migration("20240106161349_AirbnbClone")]
+    partial class AirbnbClone
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,10 +43,14 @@ namespace Airbnb.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("real");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("FreeDate")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -72,8 +76,7 @@ namespace Airbnb.Persistence.Migrations
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()

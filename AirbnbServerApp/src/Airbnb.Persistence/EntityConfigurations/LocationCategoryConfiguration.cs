@@ -9,7 +9,6 @@ public class LocationCategoryConfiguration : IEntityTypeConfiguration<LocationCa
     public void Configure(EntityTypeBuilder<LocationCategory> builder)
     {
         builder.Property(category => category.Name).IsRequired().HasMaxLength(50);
-        builder.Property(category=>category.ImagePath).IsRequired().HasMaxLength(256);
         builder.HasMany(category => category.Locations)
             .WithOne(category => category.Category);
     }

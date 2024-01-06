@@ -8,6 +8,8 @@ using Airbnb.Persistence.Repositories;
 using Airbnb.Persistence.Repositories.Intefaces;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Airbnb.Application.Common.Serializer;
+using Airbnb.Infrastructure.Common.Serializer;
 
 namespace Airbnb.Api.Configurations
 {
@@ -69,9 +71,12 @@ namespace Airbnb.Api.Configurations
 
             // Register repositories and services
             builder.Services.AddScoped<ILocationRepository, LocationRepository>();
-            builder.Services.AddScoped(typeof(ILocationCategoryRepository), typeof(LocationCategoryRepostiory));
+            builder.Services.AddScoped(typeof(ILocationCategoryRepository), typeof(LocationCategoryRepository));
             builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddScoped(typeof(ILocationCategoryService), typeof(LocationCategoryService));
+            builder.Services.AddScoped<IUrlService, UrlService>();
+            builder.Services.AddSingleton<IJsonSerializationSettingsProvider,  JsonSerializationSettingsProvider>();
+            
 
             // Register Redis cache broker
             builder.Services.AddScoped<ICacheBroker, RedisDistributedCacheBroker>();
@@ -127,6 +132,7 @@ namespace Airbnb.Api.Configurations
         private static WebApplication UseDevTools(this WebApplication app)
         {
             app.UseSwagger();
+            app.UseStaticFiles();
             app.UseSwaggerUI();
 
             return app;

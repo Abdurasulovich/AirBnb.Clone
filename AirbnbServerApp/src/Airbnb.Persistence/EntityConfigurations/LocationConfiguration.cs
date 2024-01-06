@@ -9,10 +9,10 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
     public void Configure(EntityTypeBuilder<Location> builder)
     {
         builder.Property(location=>location.Name).IsRequired().HasMaxLength(256);
-        builder.Property(location=>location.ImageUrl).IsRequired().HasMaxLength(256);
         builder.Property(location=>location.BuiltYear).IsRequired().HasMaxLength(256);
         builder.Property(location=>location.FeedBack).IsRequired().HasMaxLength(256);
         builder.Property(location=>location.PricePerNight).IsRequired().HasMaxLength(256);
+        builder.Property(location => location.FreeDate).IsRequired().HasMaxLength(256);
 
         builder.HasOne(location => location.Category)
             .WithMany(category => category.Locations)

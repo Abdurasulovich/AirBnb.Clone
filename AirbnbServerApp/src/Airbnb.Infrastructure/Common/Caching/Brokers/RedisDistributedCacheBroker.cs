@@ -7,16 +7,30 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Net.WebSockets;
 using System.Text;
+using Airbnb.Application.Common.Serializer;
 
 namespace Airbnb.Infrastructure.Common.Caching.Brokers;
 
-public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettins, IDistributedCache distributedCache) : ICacheBroker
+public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettins, 
+    IDistributedCache distributedCache,
+    IJsonSerializationSettingsProvider jsonSerializationSettingsProvider) : ICacheBroker
 {
     private readonly DistributedCacheEntryOptions _entryOption = new();
     private readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
     {
         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
     };
+
+    public async ValueTask SetAsync<T>(string key, T value, CacheEntryOptions? cacheEntryOptions = default,
+        CancellationToken cancellationToken = default)
+    {
+        await distributedCache.SetStringAsync(
+            key,
+            JsonConvert.SerializeObject(value, jsonSerializationSettingsProvider.Get()),
+            cancellationToken
+        );
+    }
+
     public ValueTask DeleteAsync(string key)
     {
         distributedCache.Remove(key);

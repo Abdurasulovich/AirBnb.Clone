@@ -3,31 +3,70 @@ using Airbnb.Application.Common.Services.Interfaces;
 using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
 using Airbnb.Infrastructure.Settings;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Airbnb.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class LocationCategoryController(ILocationCategoryService _locationCategoryService) : ControllerBase
+public class LocationCategoryController(
+    ILocationCategoryService _locationCategoryService,
+    IMapper mapper) : ControllerBase
 {
     [HttpGet]
     public async ValueTask<IActionResult> GetAsync(
         [FromQuery]FilterPagination paginationOptions,
-        [FromServices]IOptions<ApiSettings> apiSettings,
         CancellationToken cancellationToken = default
     )
     {
-        var querySpecification =
-            new QuerySpecification<LocationCategory>(paginationOptions.PageSize, paginationOptions.PageToken);
+        var specification = paginationOptions.ToQueryPagination(true).ToQuerySpecification();
+        var result = await _locationCategoryService.GetAsync(specification, cancellationToken);
 
-        var result = await _locationCategoryService.GetAsync(querySpecification, cancellationToken: cancellationToken);
-        var locationCategories = result.Select(locationCategory => new LocationCategoryDto
-        {
-            Id = locationCategory.Id,
-            Name = locationCategory.Name,
-            ImagePath = locationCategory.ImagePath
-        });
-        return locationCategories.Any() ? Ok(locationCategories) : BadRequest();
+        return result.Any() ? Ok(mapper.Map<List<LocationCategoryDto>>(result)) : NoContent();
+    }
+
+    [HttpPost]
+    public async ValueTask<IActionResult> CreateAsync(
+        [FromBody] LocationCategoryDto locationCategoryDto,
+        CancellationToken cancellationToken = default)
+    {
+
+        var result = await _locationCategoryService.CreateAsync(mapper.Map<LocationCategory>(locationCategoryDto),
+            cancellationToken: cancellationToken);
+
+        return result is not null ? Ok(result) : BadRequest();
+    }
+
+    [HttpPut]
+    public async ValueTask<IActionResult> UpdateAsync([FromBody] LocationCategoryDto locationCategoryDto,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _locationCategoryService.UpdateAsync(mapper.Map<LocationCategory>(locationCategoryDto));
+
+        return result is not null ? Ok(result) : BadRequest();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async ValueTask<IActionResult> DeleteByIdAsync([FromQuery] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _locationCategoryService.DeleteByIdAsync(id, cancellationToken: cancellationToken);
+
+        return result ? Ok(result) : BadRequest();
+    }
+
+    [HttpPut("{id:guid}")]
+    public async ValueTask<IActionResult> UploadImage(
+        [FromRoute] Guid id,
+        [FromServices] IWebHostEnvironment environment,
+        IFormFile imagePath,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result =
+            await _locationCategoryService.UploadImgAsync(id, imagePath, environment.WebRootPath, cancellationToken);
+
+        return result is not null ? Ok(result) : BadRequest();
     }
 }

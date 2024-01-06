@@ -1,11 +1,9 @@
 ﻿using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using AirBnB.Domain.Common.Query;
+using Microsoft.AspNetCore.Http;
+
 
 namespace Airbnb.Application.Common.Services.Interfaces;
 
@@ -17,8 +15,7 @@ public interface ILocationCategoryService
         );
 
     ValueTask<IList<LocationCategory>> GetAsync(
-        QuerySpecification<LocationCategory> querySpecification,
-        bool asNoTracking = false,
+        QuerySpecification querySpecification,
         CancellationToken cancellationToken = default
         );
 
@@ -33,4 +30,36 @@ public interface ILocationCategoryService
         bool asNoTracking = false,
         CancellationToken cancellationToken = default
         );
+
+    ValueTask<LocationCategory> CreateAsync(
+        LocationCategory locationCategory,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
+
+    ValueTask<LocationCategory> UpdateAsync(
+        LocationCategory locationCategory,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+        );
+
+    ValueTask<bool> DeleteAsync(
+        LocationCategory locationCategory,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
+
+    ValueTask<bool> DeleteByIdAsync(
+        Guid id,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+        );
+
+    public ValueTask<string> UploadImgAsync(
+        Guid id,
+        IFormFile imagePath,
+        string webRootPath,
+        CancellationToken cancellationToken = default
+        );
+
 }

@@ -9,6 +9,6 @@ export class LocationEndpointsClient{
     }
 
     public async getAsync(){
-        return await this.client.getAsync<Array<Location>>("api/locations");
+        return await this.client.getAsync<Array<Location>>("api/location");
     }
 }

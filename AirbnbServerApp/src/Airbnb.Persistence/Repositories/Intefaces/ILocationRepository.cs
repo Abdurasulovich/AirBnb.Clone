@@ -1,6 +1,7 @@
 ﻿using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
 using System.Linq.Expressions;
+using AirBnB.Domain.Common.Query;
 
 namespace Airbnb.Persistence.Repositories.Intefaces;
 
@@ -11,8 +12,7 @@ public interface ILocationRepository
         bool asNoTracking = false
         );
     ValueTask<IList<Location>> GetAsync(
-        QuerySpecification<Location> querySpecification,
-        bool asNoTracking = false,
+        QuerySpecification querySpecification,
         CancellationToken cancellationToken = default
         );
 
@@ -27,4 +27,28 @@ public interface ILocationRepository
         bool asNoTracking = false,
         CancellationToken cancellationToken = default
         );
+    
+    ValueTask<Location> CreateAsync(
+        Location location,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
+
+    ValueTask<Location> UpdateAsync(
+        Location location,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
+
+    ValueTask<bool> DeleteAsync(
+        Location location,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
+
+    ValueTask<bool> DeleteByIdAsync(
+        Guid id,
+        bool saveChanges = true,
+        CancellationToken cancellationToken = default
+    );
 }
