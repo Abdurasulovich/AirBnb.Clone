@@ -1,6 +1,7 @@
 ﻿using Airbnb.Api.Models.Dtos;
 using Airbnb.Application.Common.Services.Interfaces;
 using Airbnb.Domain.Common.Query;
+using AirBnB.Domain.Common.Query;
 using Airbnb.Domain.Entities;
 using Airbnb.Infrastructure.Settings;
 using AutoMapper;
@@ -15,13 +16,12 @@ public class LocationCategoryController(
     IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    public async ValueTask<IActionResult> GetAsync(
+    public async ValueTask<IActionResult> Get(
         [FromQuery]FilterPagination paginationOptions,
         CancellationToken cancellationToken = default
     )
     {
-        var specification = paginationOptions.ToQueryPagination(true).ToQuerySpecification();
-        var result = await _locationCategoryService.GetAsync(specification, cancellationToken);
+        var result = _locationCategoryService.Get();
 
         return result.Any() ? Ok(mapper.Map<List<LocationCategoryDto>>(result)) : NoContent();
     }

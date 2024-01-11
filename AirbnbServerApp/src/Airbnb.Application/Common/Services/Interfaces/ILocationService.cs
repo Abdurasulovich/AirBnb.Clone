@@ -19,7 +19,7 @@ public interface ILocationService
         );
 
     ValueTask<IList<Location>> GetAsync(
-        QuerySpecification querySpecification,
+        QuerySpecification<Location> querySpecification,
         CancellationToken cancellationToken = default
         );
 

@@ -12,7 +12,7 @@ public interface ILocationRepository
         bool asNoTracking = false
         );
     ValueTask<IList<Location>> GetAsync(
-        QuerySpecification querySpecification,
+        QuerySpecification<Location> querySpecification,
         CancellationToken cancellationToken = default
         );
 

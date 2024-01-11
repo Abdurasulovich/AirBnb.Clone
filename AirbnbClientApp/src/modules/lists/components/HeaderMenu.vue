@@ -1,24 +1,26 @@
 <template>
   <!--Locations menu-->
-  <div class="flex flex-grow md:grow-0 md:w-fit items-center pl-6 pr-2 gap-4 border border-gray-300 shadow-md rounded-full">
+  <div class="flex flex-grow md:grow-0 md:w-fit items-center justify-center pl-6 gap-4 border border-gray-300 shadow-md rounded-full">
 
     <!--Location menu detailed-->
-    <div class="h-12 hidden md:flex items-center justify-center gap-5">
+    <div class="h-8 hidden md:flex items-center justify-center gap-5 theme-text-primary">
 
       <button class="text-sm font-medium line-clamp-1">
         <span class="line-clamp-1">Anywhere</span>
       </button>
 
-      <div class="border-r border-gray-300 h-3/5"></div>
+      <div class="theme-border h-3/5"></div>
 
       <button class="text-sm font-medium">
         <span class="line-clamp-1">Any week</span>
       </button>
 
-      <div class="border-r border-gray-300 h-3/5"></div>
+      <div class="theme-border h-3/5"></div>
 
-      <button class="text-sm gap-3 flex items-center justify-center text-textSecondary">
-        <span class="line-clamp-1">Add guests</span>
+      <button class="flex items-center justify-between text-textSecondary text-sm gap-3">
+        <span class="line-clamp-1">
+          Add guests
+        </span>
 
         <span class="bg-logoPrimary h-[32px] w-[32px] flex items-center justify-center rounded-full text-white">
           <svg xmlns="http://www.w3.org/2000/svg"
@@ -35,9 +37,9 @@
     </div>
 
     <!--Location menu simple-->
-    <button class="md:hidden flex items-center justify-center gap-3 h-12">
+    <button class="md:hidden flex items-center justify-center gap-2 h-8">
       <span class="h-[40px] w-[40px] flex items-center justify-center text-textPrimary">
-        <svg class="w-[20px] h-[20px] stroke-textPrimary stroke-[5px]"
+        <svg class="w-[20px] h-[20px] theme-icon-primary stroke-[5px]"
              width="20px" height="20px"
              xmlns="http://www.w3.org/2000/svg"
              viewBox="0 0 32 32"
@@ -45,15 +47,16 @@
              role="presentation"
              focusable="false">
                         <path fill="none"
-                              d="M13 24a11 11 0 1 0 0-22 11 11 0 0 0 0 22zm8-3 9 9"></path>
+                              d="M13 24a11 11 0 1 0 0-22 11 11 0 0 0 0 22zm8-3 9 9">
+                        </path>
         </svg>
       </span>
 
       <span class="flex flex-col items-start">
-        <span class="text-sm font-medium">
+        <span class="text-sm font-medium theme-text-primary">
           <span>Anywhere</span>
         </span>
-        <span class="text-xs text-textSecondary">
+        <span class="text-xs theme-text-secondary">
           <span>Any week</span>
           <span>•</span>
           <span>Add guests</span>

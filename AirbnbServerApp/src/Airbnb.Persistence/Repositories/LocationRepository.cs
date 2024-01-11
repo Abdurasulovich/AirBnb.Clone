@@ -17,7 +17,7 @@ public class LocationRepository(AirbnbDbContext airBnbDbContext, ICacheBroker ca
     IQueryable<Location> ILocationRepository.Get(Expression<Func<Location, bool>>? predicate, bool asNoTracking)
         =>base.Get(predicate, asNoTracking);
 
-    async ValueTask<IList<Location>> ILocationRepository.GetAsync(QuerySpecification querySpecification, CancellationToken cancellationToken)
+    async ValueTask<IList<Location>> ILocationRepository.GetAsync(QuerySpecification<Location> querySpecification, CancellationToken cancellationToken)
     {
         var test = await DbContext.Locations.Include(x => x.Category).Where(x => x.Category!.Name.Equals("Castle"))
             .ToListAsync(cancellationToken: cancellationToken);

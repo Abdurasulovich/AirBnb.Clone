@@ -8,7 +8,7 @@ export class LocationCategoriesEndpointsClients{
         this.client = client;
     }
 
-    public  async  getAsync(){
+    public async getAsync(){
         return await this.client.getAsync<Array<LocationCategory>>("api/locationcategory");
     }
 }

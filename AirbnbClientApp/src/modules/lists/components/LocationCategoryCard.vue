@@ -17,5 +17,5 @@ const props = defineProps({
     type: Object as ()=>LocationCategory,
     required: true
   }
-});
+})
 </script>

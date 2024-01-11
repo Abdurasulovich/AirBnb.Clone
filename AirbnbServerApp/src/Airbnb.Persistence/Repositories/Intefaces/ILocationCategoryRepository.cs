@@ -13,7 +13,7 @@ public interface ILocationCategoryRepository
         );
 
     ValueTask<IList<LocationCategory>> GetAsync(
-        QuerySpecification querySpecification,
+        QuerySpecification<LocationCategory> querySpecification,
         CancellationToken cancellationToken = default
         );
 

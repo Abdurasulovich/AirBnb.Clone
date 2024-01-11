@@ -18,7 +18,7 @@ public class LocationCategoryRepository(AirbnbDbContext airBnbDbContext, ICacheB
         => base.Get(predicate, asNoTracking);
 
     public new ValueTask<IList<LocationCategory>> GetAsync(
-        QuerySpecification querySpecification,
+        QuerySpecification<LocationCategory> querySpecification,
         CancellationToken cancellationToken = default)
         => base.GetAsync(querySpecification, cancellationToken);
 

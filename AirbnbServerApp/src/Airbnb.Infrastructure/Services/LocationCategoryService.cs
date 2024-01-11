@@ -11,10 +11,21 @@ namespace Airbnb.Infrastructure.Services;
 public class LocationCategoryService(ILocationCategoryRepository locationCategoryRepository, IUrlService urlService) : ILocationCategoryService
 {
     private readonly string folderPath = "Assets/Images/";
-    public IQueryable<LocationCategory> Get(Expression<Func<LocationCategory, bool>>? predicate = null, bool asNoTracking = false)
-        => locationCategoryRepository.Get(predicate, asNoTracking);
 
-    public async ValueTask<IList<LocationCategory>> GetAsync(QuerySpecification querySpecification,
+    public IQueryable<LocationCategory> Get(Expression<Func<LocationCategory, bool>>? predicate = null,
+        bool asNoTracking = false)
+    {
+        var list = new List<LocationCategory>();
+        var result = locationCategoryRepository.Get(predicate, asNoTracking);
+        foreach (var img in result)
+        {
+            img.ImagePath = "https://localhost:7043/" + img.ImagePath;
+            list.Add(img);
+        }
+        return list.AsQueryable();
+    }
+
+    public async ValueTask<IList<LocationCategory>> GetAsync(QuerySpecification<LocationCategory> querySpecification,
         CancellationToken cancellationToken = default)
     {
         var list = new List<LocationCategory>();

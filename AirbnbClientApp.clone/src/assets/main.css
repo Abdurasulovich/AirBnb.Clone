@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+    .theme-bg-primary {
+        @apply bg-bgColorPrimary dark:bg-bgColorPrimaryDark
+    }
+
+    .theme-bg-primary-toggle {
+        @apply bg-bgColorPrimaryDark dark:bg-bgColorPrimary
+    }
+    .theme-text-primary-icon {
+        @apply text-textPrimaryDark dark:text-white
+    }
+
+    .theme-bg-accent {
+        @apply bg-textSecondaryDark dark:bg-borderColorDark;
+    }
+
+    .theme-bg-secondary {
+        @apply bg-bgColorSecondary dark:bg-bgColorSecondaryDark;
+    }
+
+    .theme-border {
+        @apply border border-borderColor dark:border-borderColorDark;
+    }
+
+    .theme-shadow {
+        @apply shadow-shadowColor;
+    }
+
+    .theme-text-primary {
+        @apply text-textPrimary dark:text-textPrimaryDark;
+    }
+
+    .theme-text-secondary {
+        @apply text-textSecondary dark:text-textSecondaryDark;
+    }
+
+    .theme-text-toggle-icon{
+        @apply text-textPrimaryDark dark:text-textPrimary
+    }
+    .theme-icon-primary {
+        @apply text-textPrimary dark:text-textPrimaryDark;
+        @apply stroke-textSecondary dark:text-textSecondaryDark;
+        @apply fill-textSecondary dark:fill-textSecondaryDark;
+    }
+
+    .hover-shadow {
+        @apply shadow-md hover:shadow-lg;
+    }
+
+    .hover-shadow-zero {
+        @apply shadow-none hover:shadow-md;
+    }
+
+    .primary-transition {
+        @apply transition duration-200;
+    }
+
+    .primary-transition-toggle{
+        @apply transition-all duration-300
+    }
+
+    .select-opacity {
+        @apply hover:opacity-90 focus:opacity-100 active:opacity-100 group-hover:opacity-90 group-focus:opacity-100 group-active:opacity-100;
+    }
+
+    .select-item {
+        @apply bg-transparent hover:bg-logoAccent focus:bg-logoSelected group-active:bg-logoSelected group-hover:bg-logoAccent group-focus:bg-logoSelected active:bg-logoSelected;
+    }
+
+    .selected-opacity {
+        @apply opacity-100;
+    }
+
+    .content-padding {
+        @apply px-6 md:px-10 xl:px-20;
+    }
+}
+
+@layer utilities{
+    @variants responsive {
+        .no-scrollbar::-webkit-scrollbar{
+            display: none;
+        }
+
+        .no-scrollbar{
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    }
+}

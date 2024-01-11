@@ -34,7 +34,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
     }
 
     protected async ValueTask<IList<TEntity>> GetAsync(
-        QuerySpecification querySpecification,
+        QuerySpecification<TEntity> querySpecification,
         CancellationToken cancellationToken = default
     )
     {

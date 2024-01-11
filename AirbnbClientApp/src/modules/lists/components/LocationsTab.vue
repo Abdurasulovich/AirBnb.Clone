@@ -5,7 +5,7 @@
     <!-- Location previous pagination -->
     <div class="mb-3">
       <button
-          class="border border-borderSecondary h-8 w-8 flex items-center justify-center rounded-full shadow-md">
+          class="border border-b-bgColorSecondary hover-shadow theme-icon-secondary h-8 w-8 flex items-center justify-center rounded-full shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" role="presentation"
              focusable="false"
              style="display: block; fill: none; height: 12px; width: 12px; stroke: currentcolor; stroke-width: 5.33333; overflow: visible;">
@@ -49,12 +49,22 @@
       <button
           class="ml-3 flex group h-12 w-auto px-4 border border-borderSecondary justify-center items-center rounded-lg gap-3">
         <span class="text-xs font-medium whitespace-nowrap">Display total before taxes</span>
+        <location-filter  v-model="toggleState"/>
       </button>
     </div>
 
   </div>
 
 </template>
-<script setup lang="ts">
+<script lang="ts">
 import LocationCategories from "@/modules/lists/components/LocationCategories.vue";
+import LocationFilter from "@/modules/lists/components/LocationFilter.vue";
+export default{
+  components:{LocationCategories, LocationFilter},
+  data(){
+    return{
+      toggleState: false
+    }
+  }
+}
 </script>

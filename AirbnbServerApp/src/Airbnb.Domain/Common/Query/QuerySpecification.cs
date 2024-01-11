@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using Airbnb.Domain.Common.Caching;
-using Airbnb.Domain.Common.Entities.Interfaces;
 using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Comparers;
 using Microsoft.EntityFrameworkCore.Query;
@@ -14,9 +13,8 @@ namespace AirBnB.Domain.Common.Query;
 /// <param name="pageToken"></param>
 /// <param name="asNoTracking"></param>
 /// <typeparam name="TEntity"></typeparam>
-public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asNoTracking)
-    : QuerySpecification(pageSize, pageToken, asNoTracking) where TEntity :
-    IEntity
+public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asNoTracking, int? filterHashCode = default)
+     : ICacheModel
 {
     /// <summary>
     /// Gets filtering options collection for query.
@@ -33,6 +31,18 @@ public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asN
     /// </summary>
     public List<Expression<Func<TEntity, object>>> IncludingOptions { get; } = [];
 
+    public FilterPagination PaginationOptions { get; } = new()
+    {
+        PageSize = pageSize,
+        PageToken = pageToken
+    };
+
+    public bool AsNoTracking { get; } = asNoTracking;
+
+    public int? FilterHashCode { get; } = filterHashCode;
+
+    public string CacheKey => $"{typeof(TEntity).Name}_{GetHashCode()}";
+
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
@@ -40,6 +50,9 @@ public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asN
 
         foreach (var filter in FilteringOptions.Order(new PredicateExpressionComparer<TEntity>()))
             hashCode.Add(expressionEqualityComparer.GetHashCode(filter));
+
+        foreach (var orderExpression in IncludingOptions.Order(new KeySelectorExpressionComparer<TEntity>()))
+            hashCode.Add(expressionEqualityComparer.GetHashCode(orderExpression));
 
         foreach (var filter in OrderingOptions)
             hashCode.Add(expressionEqualityComparer.GetHashCode(filter.KeySelector));
@@ -55,7 +68,7 @@ public class QuerySpecification<TEntity>(uint pageSize, uint pageToken, bool asN
     }
 }
 
-public class QuerySpecification : CacheModel
+public class QuerySpecification : ICacheModel
 {
     /// <summary>
     /// /// Gets pagination options for query.
@@ -90,5 +103,5 @@ public class QuerySpecification : CacheModel
         return obj is QuerySpecification querySpecification && querySpecification.GetHashCode() == GetHashCode();
     }
 
-    public override string CacheKey => GetHashCode().ToString();
+    public string CacheKey => GetHashCode().ToString();
 }

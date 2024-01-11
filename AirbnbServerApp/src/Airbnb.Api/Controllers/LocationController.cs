@@ -1,6 +1,7 @@
 ﻿using Airbnb.Api.Models.Dtos;
 using Airbnb.Application.Common.Services.Interfaces;
 using Airbnb.Domain.Common.Query;
+using AirBnB.Domain.Common.Query;
 using Airbnb.Domain.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,11 @@ namespace Airbnb.Api.Controllers;
 public class LocationController(ILocationService _locationService, IMapper mapper) : ControllerBase
 {
     [HttpGet]
-    public async ValueTask<IActionResult> GetAsync(
+    public async ValueTask<IActionResult> Get(
         [FromQuery] FilterPagination paginationOptions, 
         CancellationToken cancellationToken = default)
     {
-        var specification = paginationOptions.ToQueryPagination(true).ToQuerySpecification();
-        var result = await _locationService.GetAsync(specification, cancellationToken);
+        var result =  _locationService.Get();
         
         return result.Any() ? Ok(mapper.Map<List<LocationDto>>(result)) : NoContent();
     }

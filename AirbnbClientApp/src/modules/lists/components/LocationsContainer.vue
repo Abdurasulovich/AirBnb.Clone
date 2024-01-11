@@ -1,5 +1,5 @@
 <template>
-  <article class="mt-[20px] bg-defaultBackground content-padding">
+  <article class="mt-[20px] bg-bgColorPrimary theme-icon-secondary content-padding">
     <div class="flex flex-col items-center justify-center">
 
       <!--Locations Tab-->
