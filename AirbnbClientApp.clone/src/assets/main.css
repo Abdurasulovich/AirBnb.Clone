@@ -2,16 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer components{
     .theme-bg-primary {
         @apply bg-bgColorPrimary dark:bg-bgColorPrimaryDark
     }
 
     .theme-bg-primary-toggle {
-        @apply bg-bgColorPrimaryDark dark:bg-bgColorPrimary
+        @apply bg-bgColorPrimary dark:bg-bgColorPrimaryDark
     }
     .theme-text-primary-icon {
-        @apply text-textPrimaryDark dark:text-white
+        @apply text-textPrimary dark:text-textPrimaryDark
     }
 
     .theme-bg-accent {
@@ -34,12 +35,15 @@
         @apply text-textPrimary dark:text-textPrimaryDark;
     }
 
-    .theme-text-secondary {
+    .theme-text-toggle-icon-sec {
         @apply text-textSecondary dark:text-textSecondaryDark;
+    }
+    .theme-category-icon {
+        @apply invert-0 dark:invert
     }
 
     .theme-text-toggle-icon{
-        @apply text-textPrimaryDark dark:text-textPrimary
+        @apply text-textPrimary dark:text-textPrimaryDark
     }
     .theme-icon-primary {
         @apply text-textPrimary dark:text-textPrimaryDark;

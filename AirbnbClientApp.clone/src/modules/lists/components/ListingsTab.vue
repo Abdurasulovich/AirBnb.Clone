@@ -1,7 +1,7 @@
 <template>
 
   <!--Lists categories previous pagination-->
-  <div class="fixed w-full top-0 pt-2 mt-20 z-10 theme-bg-primary flex items-center justify-center gap-4 content-padding">
+  <div class="fixed w-full top-0 pt-2 mt-20 z-10 theme-bg-primary flex items-center justify-center gap-4 content-padding dark:shadow">
     <div class="mb-3 theme-text-primary">
       <button class="border theme-border h-8 w-8 flex items-center justify-center rounded-full hover-shadow">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" role="presentation" focusable="false"
@@ -38,11 +38,11 @@
           <path fill="none"
                 d="M7 16H3m26 0H15M29 6h-4m-8 0H3m26 20h-4M7 16a4 4 0 1 0 8 0 4 4 0 0 0-8 0zM17 6a4 4 0 1 0 8 0 4 4 0 0 0-8 0zm0 20a4 4 0 1 0 8 0 4 4 0 0 0-8 0zm0 0H3"></path>
         </svg>
-        <span>Filters</span>
+        <span class="theme-text-primary">Filters</span>
       </button>
 
       <button class="ml-3 flex group h-12 w-auto px-4 theme-border justify-center items-center rounded-lg gap-3">
-        <span class="text-xs font-medium whitespace-nowrap">Display total before taxes</span>
+        <span class="text-xs font-medium whitespace-nowrap theme-text-primary">Display total before taxes</span>
           <lists-filter v-model="toggleState"/>
       </button>
     </div>

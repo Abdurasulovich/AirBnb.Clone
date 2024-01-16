@@ -1,16 +1,15 @@
 ﻿using Airbnb.Application.Common.Services.Interfaces;
-using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
-using Airbnb.Persistence.Repositories.Intefaces;
 using System.Linq.Expressions;
 using AirBnB.Domain.Common.Query;
+using Airbnb.Persistence.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Airbnb.Infrastructure.Services;
 
 public class LocationCategoryService(ILocationCategoryRepository locationCategoryRepository, IUrlService urlService) : ILocationCategoryService
 {
-    private readonly string folderPath = "Assets/Images/";
+    private readonly string _folderPath = "Assets/Images/";
 
     public IQueryable<LocationCategory> Get(Expression<Func<LocationCategory, bool>>? predicate = null,
         bool asNoTracking = false)
@@ -63,7 +62,7 @@ public class LocationCategoryService(ILocationCategoryRepository locationCategor
         var findFile = await GetByIdAsync(id, cancellationToken: cancellationToken) ??
                        throw new InvalidOperationException("LocationCategory with this id not found!");
 
-        var relativePath = folderPath + id.ToString() + "." + imagePath.FileName.Split('.')[1];
+        var relativePath = _folderPath + id.ToString() + "." + imagePath.FileName.Split('.')[1];
         var filePath = Path.Combine(webRootPath, relativePath);
         if(File.Exists(filePath)) File.Delete(filePath);
         using (var fileStream = new FileStream(filePath, FileMode.Create))

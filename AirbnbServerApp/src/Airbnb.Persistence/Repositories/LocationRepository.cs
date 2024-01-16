@@ -1,12 +1,11 @@
 ﻿using Airbnb.Domain.Common.Caching;
-using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
 using Airbnb.Persistence.Caching.Brokers.Interfaces;
 using Airbnb.Persistence.DataContexts;
-using Airbnb.Persistence.Repositories.Intefaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using AirBnB.Domain.Common.Query;
+using Airbnb.Persistence.Repositories.Interfaces;
 
 namespace Airbnb.Persistence.Repositories;
 

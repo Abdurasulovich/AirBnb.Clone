@@ -15,8 +15,12 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettins,
     IDistributedCache distributedCache,
     IJsonSerializationSettingsProvider jsonSerializationSettingsProvider) : ICacheBroker
 {
-    private readonly DistributedCacheEntryOptions _entryOption = new();
-    private readonly JsonSerializerSettings JsonSettings = new JsonSerializerSettings
+    private readonly DistributedCacheEntryOptions _entryOption = new()
+    {
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(cacheSettins.Value.AbsoluteExpirationInSeconds),
+        SlidingExpiration = TimeSpan.FromSeconds(cacheSettins.Value.SlidingExpirationInSeconds)
+    };
+    private readonly JsonSerializerSettings _jsonSettings = new()
     {
         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
     };
@@ -31,42 +35,40 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettins,
         );
     }
 
-    public ValueTask DeleteAsync(string key)
+    public ValueTask DeleteAsync(string key, CancellationToken cancellationToken = default)
     {
         distributedCache.Remove(key);
         return ValueTask.CompletedTask;
     }
 
-    public async ValueTask<T> GetAsync<T>(string key)
+    public async ValueTask<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        var value = await distributedCache.GetAsync(key);
-        return value is not null ? JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(value), JsonSettings) : default;
+        var value = await distributedCache.GetAsync(key, cancellationToken);
+        
+        return value is not null 
+            ? JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(value), jsonSerializationSettingsProvider.Get()) 
+            : default;
     }
-
-    public async ValueTask<T> GetOrSetAsync<T>(string key, Func<Task<T>> valueFactory, CacheEntryOptions? cacheEntryOptions)
+    public async ValueTask<T?> GetOrSetAsync<T>(string key, Func<Task<T>> valueFactory, 
+        CacheEntryOptions? cacheEntryOptions = default, 
+        CancellationToken cancellationToken = default)
     {
-        var cacheValue = await distributedCache.GetStringAsync(key);
-        if (cacheValue is not null) return JsonConvert.DeserializeObject<T>(cacheValue, JsonSettings);
+        var cacheValue = await distributedCache.GetStringAsync(key, cancellationToken);
+        if (cacheValue is not null) return JsonConvert.DeserializeObject<T>(cacheValue, jsonSerializationSettingsProvider.Get());
 
         var value = await valueFactory();
-        await SetAsync(key, await valueFactory(), cacheEntryOptions);
+        await SetAsync(key, await valueFactory(), cacheEntryOptions, cancellationToken);
 
         return value;
     }
 
-    public async ValueTask SetAsync<T>(string key, T value, CacheEntryOptions? cacheEntryOptions = null)
-    {
-        await distributedCache.SetStringAsync(key, JsonConvert.SerializeObject(value, JsonSettings),
-            GetCacheEntryOptions(cacheEntryOptions));
-    }
-
-    public ValueTask<bool> TryGetAsync<T>(string key, out T? value)
+    public ValueTask<bool> TryGetAsync<T>(string key, out T? value, CancellationToken cancellationToken = default)
     {
         var foundEntry = distributedCache.GetString(key);
 
         if(foundEntry is not null)
         {
-            value = JsonConvert.DeserializeObject<T>(foundEntry, JsonSettings);
+            value = JsonConvert.DeserializeObject<T>(foundEntry, jsonSerializationSettingsProvider.Get());
             return ValueTask.FromResult(true);
         }
 
@@ -76,13 +78,17 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> cacheSettins,
 
     public DistributedCacheEntryOptions GetCacheEntryOptions(CacheEntryOptions? cacheEntryOptions)
     {
-        if (_entryOption == default || (!_entryOption.AbsoluteExpirationRelativeToNow.HasValue && !_entryOption.SlidingExpiration.HasValue))
+        if (cacheEntryOptions == default || (!cacheEntryOptions.AbsoluteExpirationRelativeNow.HasValue && !cacheEntryOptions.SlidingExpiration.HasValue))
             return _entryOption;
 
         var currentEntryOptions = _entryOption.DeepClone();
 
-        currentEntryOptions.AbsoluteExpirationRelativeToNow = _entryOption.AbsoluteExpirationRelativeToNow;
-        currentEntryOptions.SlidingExpiration = _entryOption.SlidingExpiration;
+        currentEntryOptions.AbsoluteExpirationRelativeToNow = _entryOption.AbsoluteExpirationRelativeToNow.HasValue
+            ? currentEntryOptions.AbsoluteExpirationRelativeToNow 
+            : null;
+        currentEntryOptions.SlidingExpiration = cacheEntryOptions.SlidingExpiration.HasValue 
+            ? currentEntryOptions.SlidingExpiration
+            : null;
 
         return currentEntryOptions;
     }

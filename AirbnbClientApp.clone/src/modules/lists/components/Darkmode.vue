@@ -5,6 +5,7 @@
 
 </template>
 <script setup lang="ts">
+import {defineProps} from "vue";
 const props = defineProps({
   modelValue:{
     type:Boolean

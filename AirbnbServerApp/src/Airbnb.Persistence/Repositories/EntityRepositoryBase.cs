@@ -1,11 +1,9 @@
 ﻿using Airbnb.Domain.Common.Caching;
 using Airbnb.Domain.Common.Entities.Interfaces;
-using Airbnb.Domain.Common.Query;
 using Airbnb.Persistence.Caching.Brokers.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using AirBnB.Domain.Common.Query;
-using Airbnb.Domain.Entities;
 using AirBnB.Persistence.Extensions;
 
 namespace Airbnb.Persistence.Repositories;
@@ -52,9 +50,10 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
             foundEntities = await initialQuery.ToListAsync(cancellationToken);
 
             if(cacheEntryOptions is not null)
-                await cacheBroker.SetAsync(cacheKey, foundEntities, cacheEntryOptions);
+                await cacheBroker.SetAsync(cacheKey, foundEntities, cacheEntryOptions, cancellationToken);
 
-        }else  foundEntities = cacheEntities;
+        }else if(cacheEntities is not null)  
+            foundEntities = cacheEntities;
 
         return foundEntities;
     }
@@ -77,7 +76,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
             foundEntity = await initialQuery.FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
 
             if (foundEntity is not null && cacheEntryOptions is not null)
-                await cacheBroker.SetAsync(foundEntity.Id.ToString(), foundEntity, cacheEntryOptions);
+                await cacheBroker.SetAsync(foundEntity.Id.ToString(), foundEntity, cacheEntryOptions, cancellationToken);
         }
         else foundEntity = cachedEntity;
         
@@ -110,7 +109,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
         await DbContext.Set<TEntity>().AddAsync(entity, cancellationToken);
 
         if (cacheEntryOptions is not null)
-            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions);
+            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions, cancellationToken);
         if (saveChanges)
             await DbContext.SaveChangesAsync(cancellationToken);
 
@@ -125,7 +124,7 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(
     {
         DbContext.Set<TEntity>().Update(entity);
         if (cacheEntryOptions is not null)
-            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions);
+            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions, cancellationToken);
 
         if (saveChanges)
             await DbContext.SaveChangesAsync(cancellationToken: cancellationToken);

@@ -5,11 +5,11 @@ using Airbnb.Infrastructure.Settings;
 using Airbnb.Persistence.Caching.Brokers.Interfaces;
 using Airbnb.Persistence.DataContexts;
 using Airbnb.Persistence.Repositories;
-using Airbnb.Persistence.Repositories.Intefaces;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Airbnb.Application.Common.Serializer;
 using Airbnb.Infrastructure.Common.Serializer;
+using Airbnb.Persistence.Repositories.Interfaces;
 
 namespace Airbnb.Api.Configurations
 {

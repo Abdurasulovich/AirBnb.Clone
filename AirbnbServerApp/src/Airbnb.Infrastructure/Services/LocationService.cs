@@ -1,25 +1,24 @@
 ﻿using Airbnb.Application.Common.Services.Interfaces;
-using Airbnb.Domain.Common.Query;
 using Airbnb.Domain.Entities;
-using Airbnb.Persistence.Repositories.Intefaces;
 using System.Linq.Expressions;
 using AirBnB.Domain.Common.Query;
+using Airbnb.Persistence.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Airbnb.Infrastructure.Services;
 
 public class LocationService(ILocationRepository locationRepository, IUrlService urlService) : ILocationService
 {
-    private readonly string folderPath = "Assets/Location/";
+    private readonly string _folderPath = "Assets/Location/";
 
     public IQueryable<Location> Get(Expression<Func<Location, bool>>? predicate = null, bool asNoTracking = false)
     { 
         var imgList = new List<Location>();
         var result = locationRepository.Get(predicate, asNoTracking);
-        foreach (var imgs in result)
+        foreach (var img in result)
         {
-            imgs.ImageUrl = "https://localhost:7043/" + imgs.ImageUrl;
-            imgList.Add(imgs);
+            img.ImageUrl = "https://localhost:7043/" + img.ImageUrl;
+            imgList.Add(img);
         }
         return imgList.AsQueryable();
     }
@@ -29,10 +28,10 @@ public class LocationService(ILocationRepository locationRepository, IUrlService
     {
         var imgList = new List<Location>();
         var result = await locationRepository.GetAsync(querySpecification, cancellationToken);
-        foreach (var imgs in result)
+        foreach (var img in result)
         {
-            imgs.ImageUrl = "https://localhost:7043/" + imgs.ImageUrl;
-            imgList.Add(imgs);
+            img.ImageUrl = "https://localhost:7043/" + img.ImageUrl;
+            imgList.Add(img);
         }
         return imgList;
     }
@@ -68,7 +67,7 @@ public class LocationService(ILocationRepository locationRepository, IUrlService
         var findFile = await GetByIdAsync(id, cancellationToken: cancellationToken) ??
                       throw new InvalidOperationException("LocationCategory with this id not found!");
 
-        var relativePath = folderPath + id.ToString() + "." + imagePath.FileName.Split('.')[1];
+        var relativePath = _folderPath + id.ToString() + "." + imagePath.FileName.Split('.')[1];
         var filePath = Path.Combine(webRootPath, relativePath);
         if(File.Exists(filePath)) File.Delete(filePath);
         

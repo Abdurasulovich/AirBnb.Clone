@@ -31,6 +31,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\Assets\Images\" />
     <Folder Include="wwwroot\Assets\Location\" />
+    <Folder Include="wwwroot\Assets\User\" />
   </ItemGroup>
 
 </Project>

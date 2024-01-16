@@ -3,45 +3,46 @@ using Airbnb.Domain.Entities;
 using System.Linq.Expressions;
 using AirBnB.Domain.Common.Query;
 
-namespace Airbnb.Persistence.Repositories.Intefaces;
+namespace Airbnb.Persistence.Repositories.Interfaces;
 
-public interface ILocationRepository
+public interface ILocationCategoryRepository
 {
-    IQueryable<Location> Get(
-        Expression<Func<Location, bool>>? predicate = default,
+    IQueryable<LocationCategory> Get(
+        Expression<Func<LocationCategory, bool>>? predicate = default,
         bool asNoTracking = false
         );
-    ValueTask<IList<Location>> GetAsync(
-        QuerySpecification<Location> querySpecification,
+
+    ValueTask<IList<LocationCategory>> GetAsync(
+        QuerySpecification<LocationCategory> querySpecification,
         CancellationToken cancellationToken = default
         );
 
-    ValueTask<IList<Location>> GetByIdsAsync(
+    ValueTask<IList<LocationCategory>> GetByIdsAsync(
         IEnumerable<Guid> ids,
         bool asNoTracking = false,
         CancellationToken cancellationToken = default
         );
 
-    ValueTask<Location?> GetByIdAsync(
-        Guid locationId,
+    ValueTask<LocationCategory?> GetByIdAsync(
+        Guid id,
         bool asNoTracking = false,
         CancellationToken cancellationToken = default
         );
     
-    ValueTask<Location> CreateAsync(
-        Location location,
+    ValueTask<LocationCategory> CreateAsync(
+        LocationCategory locationCategory,
         bool saveChanges = true,
         CancellationToken cancellationToken = default
     );
 
-    ValueTask<Location> UpdateAsync(
-        Location location,
+    ValueTask<LocationCategory> UpdateAsync(
+        LocationCategory locationCategory,
         bool saveChanges = true,
         CancellationToken cancellationToken = default
     );
 
     ValueTask<bool> DeleteAsync(
-        Location location,
+        LocationCategory locationCategory,
         bool saveChanges = true,
         CancellationToken cancellationToken = default
     );
