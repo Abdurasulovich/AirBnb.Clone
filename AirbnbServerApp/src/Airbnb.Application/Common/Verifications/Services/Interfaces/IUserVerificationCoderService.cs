@@ -6,7 +6,7 @@ namespace Airbnb.Application.Common.Verifications.Services.Interfaces;
 ///<summary>
 /// Defines the interface for a user verification code service, extending the verification code service.
 ///</summary>
-public interface IUserVerificationCoderService : IVerificationCodeService
+public interface IUserInfoVerificationCoderService : IVerificationCodeService
 {
     ///<summary>
     /// Generates a list of verification codes.

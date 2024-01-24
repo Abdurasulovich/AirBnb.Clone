@@ -1,6 +1,8 @@
 ﻿namespace Airbnb.Domain.Enums;
 
-public class NotificationProcessingEvent
+public enum NotificationProcessingEvent
 {
-    
+    OnProcessing,
+    OnSending,
+    OnRendering
 }

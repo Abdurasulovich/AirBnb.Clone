@@ -1,6 +1,13 @@
-﻿namespace Airbnb.Api.Models.Mappers;
+﻿using Airbnb.Api.Models.Dtos;
+using Airbnb.Identity.Domain.Entities;
+using AutoMapper;
 
-public class AccessTokenMapper
+namespace Airbnb.Api.Models.Mappers;
+
+public class AccessTokenMapper : Profile
 {
-    
+    public AccessTokenMapper()
+    {
+        CreateMap<AccessToken, AccessTokenDto>().ReverseMap();
+    }
 }

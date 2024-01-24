@@ -42,7 +42,7 @@ public class UserService(IUserRepository userRepository) : IUserService
     ///<summary>
     /// Asynchronously gets a user by their identifier with optional tracking options.
     ///</summary>
-    public ValueTask<User?> GetById(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default)
+    public ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default)
     {
         return userRepository.GetByIdAsync(userId, asNoTracking, cancellationToken);
     }
@@ -106,7 +106,7 @@ public class UserService(IUserRepository userRepository) : IUserService
     {
         
         // Find the user by ID
-        var findFile = await GetById(id, cancellationToken: cancellationToken) ??
+        var findFile = await GetByIdAsync(id, cancellationToken: cancellationToken) ??
                        throw new InvalidOperationException("LocationCategory with this id not found!");
 
         // Define the relative and absolute paths for storing the image

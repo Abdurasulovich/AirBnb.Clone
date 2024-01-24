@@ -33,7 +33,7 @@ public interface IUserService
     ///<param name="asNoTracking">Flag indicating whether to use no-tracking for the query.</param>
     ///<param name="cancellationToken">A cancellation token to signal when to stop the operation.</param>
     ///<returns>A task representing the asynchronous operation and containing the user or null if not found.</returns>
-    ValueTask<User?> GetById(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default);
+    ValueTask<User?> GetByIdAsync(Guid userId, bool asNoTracking = false, CancellationToken cancellationToken = default);
 
     ///<summary>
     /// Asynchronously gets the system user with optional tracking options.

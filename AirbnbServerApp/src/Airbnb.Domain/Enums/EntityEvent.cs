@@ -1,6 +1,9 @@
 ﻿namespace Airbnb.Domain.Enums;
 
-public class EntityEvent
+public enum EntityEvent
 {
-    
+    OnGet,
+    OnCreate,
+    OnUpdate,
+    OnDelete
 }

@@ -1,6 +1,36 @@
-﻿namespace Airbnb.Infrastructure.Notifications.Services;
+﻿using System.Runtime.CompilerServices;
+using Airbnb.Application.Common.Notifications.Brokers.Interfaces;
+using Airbnb.Application.Common.Notifications.Models;
+using Airbnb.Application.Common.Notifications.Services.Interfaces;
+using Airbnb.Domain.Enums;
+using Airbnb.Domain.Extensions;
+using FluentValidation;
 
-public class EmailSenderService
+namespace Airbnb.Infrastructure.Notifications.Services;
+
+public class EmailSenderService(IValidator<EmailMessage> emailMessageValidator, IEnumerable<IEmailSenderBroker> emailSenderBrokers) : IEmailSenderService
 {
-    
+    private readonly IValidator<EmailMessage> _emailMessageValidator = emailMessageValidator;
+    private readonly IEnumerable<IEmailSenderBroker> _emailSenderBrokers = emailSenderBrokers;
+    public async ValueTask<bool> SendAsync(EmailMessage emailMessage, CancellationToken cancellationToken = default)
+    {
+        var validationResult = _emailMessageValidator.Validate(
+            emailMessage,
+            options => options.IncludeRuleSets(NotificationProcessingEvent.OnSending.ToString())
+            );
+
+        if (!validationResult.IsValid) throw new ValidationException(validationResult.Errors);
+
+        foreach (var emailSenderBroker in _emailSenderBrokers)
+        {
+            var sendNotificationTask = () => emailSenderBroker.SendAsync(emailMessage, cancellationToken);
+            var result = await sendNotificationTask.GetValueAsync();
+
+            emailMessage.IsSuccessful = result.IsSuccess;
+            emailMessage.ErrorMessage = result.Exception?.Message;
+            return result.IsSuccess;
+        }
+
+        return false;
+    }
 }

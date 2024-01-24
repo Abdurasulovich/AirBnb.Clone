@@ -1,5 +1,6 @@
 ﻿using AirBnB.Domain.Common;
 using Airbnb.Domain.Common.Entities.Interfaces;
+using Airbnb.Domain.Common.Query;
 using AirBnB.Domain.Common.Query;
 using Microsoft.EntityFrameworkCore;
 
@@ -222,5 +223,13 @@ public static class LinqExtensions
     {
         return source.Skip((int)((querySpecification.PaginationOptions.PageToken - 1) * querySpecification.PaginationOptions.PageSize))
             .Take((int)querySpecification.PaginationOptions.PageSize);
+    }
+    
+    public static IQueryable<TSource> ApplyPagination<TSource>(this IQueryable<TSource> source, FilterPagination paginationOptions)
+    {
+        // var pageSize = paginationOptions.DynamicPageSize;
+        // return source.Skip((int)((paginationOptions.PageToken - 1) * pageSize)).Take((int)pageSize);
+
+        return source.Skip((int)((paginationOptions.PageToken - 1) * paginationOptions.PageSize)).Take((int)paginationOptions.PageSize);
     }
 }

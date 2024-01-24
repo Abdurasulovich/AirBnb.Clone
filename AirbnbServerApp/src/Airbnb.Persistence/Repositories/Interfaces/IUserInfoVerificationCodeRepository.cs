@@ -39,4 +39,6 @@ public interface IUserInfoVerificationCodeRepository
         bool saveChanges = true,
         CancellationToken cancellationToken = default
     );
+
+    ValueTask DeactivateAsync(Guid codeId, bool saveChanges = true, CancellationToken cancellationToken = default);
 }

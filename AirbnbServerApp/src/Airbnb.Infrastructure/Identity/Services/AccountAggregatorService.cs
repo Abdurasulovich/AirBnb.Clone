@@ -16,12 +16,12 @@ namespace Airbnb.Infrastructure.Identity.Services;
 ///</summary>
 ///<param name="userService">The service for user-related operations.</param>
 ///<param name="userSettingsService">The service for user settings-related operations.</param>
-///<param name="userVerificationCoderService">The service for generating user verification codes.</param>
+///<param name="userInfoVerificationCoderService">The service for generating user verification codes.</param>
 ///<param name="eventBusBroker">The event bus broker for publishing events.</param>
 public class AccountAggregatorService(
     IUserService userService, 
     IUserSettingsService userSettingsService, 
-    IUserVerificationCoderService userVerificationCoderService, 
+    IUserInfoVerificationCoderService userInfoVerificationCoderService, 
     IEventBusBroker eventBusBroker)
     : IAccountAggregatorService
 {
@@ -64,7 +64,7 @@ public class AccountAggregatorService(
             cancellationToken
         );
 
-        var verificationCode = await userVerificationCoderService.CreateAsync(
+        var verificationCode = await userInfoVerificationCoderService.CreateAsync(
             VerificationCodeType.EmailAddressVerification,
             createUser.Id,
             cancellationToken
